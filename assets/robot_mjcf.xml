@@ -1,0 +1,478 @@
+<mujoco model="climbbot3">
+
+<option timestep="0.001" integrator="implicitfast"/>
+
+  <default>
+    <default class="robot">
+      <default class="motor">
+        <joint />
+        <motor />
+      </default>
+      <default class="visual">
+        <geom material="visualgeom" contype="0" conaffinity="0" group="2" />
+      </default>
+      <default class="collision">
+        <geom material="collision_material" condim="3" contype="0" conaffinity="1" priority="1" group="1" solref="0.005 1" solimp="0.99 0.999 1e-05" friction="1 0.01 0.01" />
+      </default>
+      <default class="linear_joint">
+        <joint type="slide"
+               ref="0.0"
+               range="0.0 0.134"
+               limited="true"
+               axis="0 0 1"
+               damping="10"
+               armature="0.01"
+               />
+      </default>
+      <default class="mimic_linear_joint">
+        <joint type="slide"
+               ref="0.0"
+               range="0.0 0.134"
+               limited="true"
+               axis="0 0 1"
+               damping="10"
+               armature="0.01"
+               />
+      </default>
+      <default class="rev_joint">
+        <joint type="hinge"
+               ref="0.0"
+               range="-1.5708 1.5708"
+               limited="true"
+               axis="0 0 1"
+               damping="2"
+               />
+      </default>
+    </default>
+  </default>
+
+  <!-- <compiler angle="radian" /> -->
+  <compiler angle="radian"/>
+
+
+  <asset>
+    <material name="servo_arm_horn_25t_aluminium_material" rgba="0.231373 0.380392 0.705882 1.0" />
+    <material name="component2_material" rgba="0.615686 0.811765 0.929412 1.0" />
+    <material name="component707_material" rgba="0.980392 0.713725 0.00392157 1.0" />
+    <material name="part_20_material" rgba="0.917647 0.917647 0.917647 1.0" />
+    <material name="part_22_material" rgba="0.972549 0.529412 0.00392157 1.0" />
+    <material name="spur_gear__22_teeth_material" rgba="0.647059 0.647059 0.647059 1.0" />
+    <material name="default_material" rgba="0.7 0.7 0.7 1" />
+    <material name="collision_material" rgba="1.0 0.28 0.1 0.9" />
+    <mesh name="servo_arm_horn_25t_aluminium.stl" file="meshes/servo_arm_horn_25t_aluminium.stl" />
+    <mesh name="component2.stl" file="meshes/component2.stl" />
+    <mesh name="component707.stl" file="meshes/component707.stl" />
+    <mesh name="ds3225mg_servo_25kg_4_8_6_8v.stl" file="meshes/ds3225mg_servo_25kg_4_8_6_8v.stl" />
+    <mesh name="servomount1.stl" file="meshes/servomount1.stl" />
+    <mesh name="part_20.stl" file="meshes/part_20.stl" />
+    <mesh name="part_22.stl" file="meshes/part_22.stl" />
+    <mesh name="spur_gear__23_teeth.stl" file="meshes/spur_gear__23_teeth.stl" />
+    <mesh name="spur_gear__22_teeth.stl" file="meshes/spur_gear__22_teeth.stl" />
+    <mesh name="part_17.stl" file="meshes/part_17.stl" />
+    <mesh name="part_1.stl" file="meshes/part_1.stl" />
+    <mesh name="part_4.stl" file="meshes/part_4.stl" />
+    <mesh name="part_6.stl" file="meshes/part_6.stl" />
+    <mesh name="flat_gripper.stl" file="meshes/flat_gripper.stl" />
+    <mesh name="gripper_0" file="convex_parts/gripper_hook_0.stl" />
+    <mesh name="gripper_1" file="convex_parts/gripper_hook_1.stl" />
+    <mesh name="gripper_2" file="convex_parts/gripper_hook_2.stl" />
+    <mesh name="gripper_3" file="convex_parts/gripper_hook_3.stl" />
+    <mesh name="gripper_4" file="convex_parts/gripper_hook_4.stl" />
+    <mesh name="part_23.stl" file="meshes/part_23.stl" />
+
+    <material name="wall_material" rgba="0.6 0.6 0.6 1"/>
+
+    <!-- Handhold convex parts (from VHACD) -->
+    <mesh name="hold_0" file="convex_parts/wall_part_0.stl"/>
+    <mesh name="hold_1" file="convex_parts/wall_part_1.stl"/>
+    <mesh name="hold_2" file="convex_parts/wall_part_2.stl"/>
+    <mesh name="hold_3" file="convex_parts/wall_part_3.stl"/>
+
+    <material name="hold_material" rgba="0.8 0.2 0.2 1"/>
+  </asset>
+
+  <worldbody>
+      <!-- ✅ Ground plane added -->
+    <geom name="floor" 
+          type="plane" 
+          size="5 5 0.1" 
+          pos="0 0 0" 
+          rgba="0.3 0.5 0.3 1" 
+          contype="1" 
+          conaffinity="1" />
+
+  <body name="climbing_wall" pos="0 0 0" euler="-1.57 1.57 0">
+  <!-- This is the "frame" for the entire wall.
+       Move/rotate this body and all children follow. -->
+
+    <!-- The wall board -->
+    <geom name="wall_board"
+          type="box"
+          size="1.0 0.005 1.5"   
+          pos="0 0 1.5"        
+          material="wall_material"
+          contype="1" conaffinity="1"/>
+
+    <!-- Handhold 1 -->
+    <body name="hold_1" pos="-0.1 -0.005 0.5">
+      <geom type="mesh" mesh="hold_0" material="hold_material" contype="1" conaffinity="1"/>
+      <geom type="mesh" mesh="hold_1" material="hold_material" contype="1" conaffinity="1"/>
+      <geom type="mesh" mesh="hold_2" material="hold_material" contype="1" conaffinity="1"/>
+      <geom type="mesh" mesh="hold_3" material="hold_material" contype="1" conaffinity="1"/>
+    </body>
+
+    <!-- Handhold 2 -->
+    <body name="hold_2" pos="0.2 -0.005 0.7">
+      <geom type="mesh" mesh="hold_0" material="hold_material" contype="1" conaffinity="1"/>
+      <geom type="mesh" mesh="hold_1" material="hold_material" contype="1" conaffinity="1"/>
+      <geom type="mesh" mesh="hold_2" material="hold_material" contype="1" conaffinity="1"/>
+      <geom type="mesh" mesh="hold_3" material="hold_material" contype="1" conaffinity="1"/>
+    </body>
+
+    <!-- Handhold 3 -->
+    <body name="hold_3" pos="-0.1 -0.005 0.9">
+      <geom type="mesh" mesh="hold_0" material="hold_material" contype="1" conaffinity="1"/>
+      <geom type="mesh" mesh="hold_1" material="hold_material" contype="1" conaffinity="1"/>
+      <geom type="mesh" mesh="hold_2" material="hold_material" contype="1" conaffinity="1"/>
+      <geom type="mesh" mesh="hold_3" material="hold_material" contype="1" conaffinity="1"/>
+    </body>
+
+
+    <!-- Handhold 4 -->
+    <body name="hold_4" pos="0.2 -0.005 1.1">
+      <geom type="mesh" mesh="hold_0" material="hold_material" contype="1" conaffinity="1"/>
+      <geom type="mesh" mesh="hold_1" material="hold_material" contype="1" conaffinity="1"/>
+      <geom type="mesh" mesh="hold_2" material="hold_material" contype="1" conaffinity="1"/>
+      <geom type="mesh" mesh="hold_3" material="hold_material" contype="1" conaffinity="1"/>
+    </body>
+
+
+    <!-- Handhold 5 -->
+    <body name="hold_5" pos="-0.1 -0.005 1.3">
+      <geom type="mesh" mesh="hold_0" material="hold_material" contype="1" conaffinity="1"/>
+      <geom type="mesh" mesh="hold_1" material="hold_material" contype="1" conaffinity="1"/>
+      <geom type="mesh" mesh="hold_2" material="hold_material" contype="1" conaffinity="1"/>
+      <geom type="mesh" mesh="hold_3" material="hold_material" contype="1" conaffinity="1"/>
+    </body>
+
+    <!-- Handhold 6 -->
+    <body name="hold_6" pos="0.2 -0.005 1.5">
+      <geom type="mesh" mesh="hold_0" material="hold_material" contype="1" conaffinity="1"/>
+      <geom type="mesh" mesh="hold_1" material="hold_material" contype="1" conaffinity="1"/>
+      <geom type="mesh" mesh="hold_2" material="hold_material" contype="1" conaffinity="1"/>
+      <geom type="mesh" mesh="hold_3" material="hold_material" contype="1" conaffinity="1"/>
+    </body>
+  </body>
+
+
+
+    <!-- Robot starts here -->
+    <!-- <body name="assembly_7" pos="0.00000000 0.00000000 1.10287843" quat="1 0 0 0" childclass="robot"> -->
+    <body name="assembly_7" pos="0.00000000 0.00000000 0.10287843" euler="3.14 0 0" childclass="robot">
+      <!-- <freejoint name="floating_base" /> -->
+      <geom name="assembly_7_collision_0" pos="0.180853 0.0191578 0.0276276" quat="1.0 0.0 0.0 0.0" type="mesh" mesh="servo_arm_horn_25t_aluminium.stl" class="collision" />
+      <geom name="assembly_7_collision_1" pos="0.0187847 0.0410598 0.0136672" quat="0.9905504478023395 5.573614101919686e-17 0.13714886203897114 2.5355357762417037e-17" type="mesh" mesh="component2.stl" class="collision" />
+      <geom name="assembly_7_collision_2" pos="0.0187847 0.10846 0.0136672" quat="0.9905504478023395 5.573614101919686e-17 0.13714886203897114 2.5355357762417037e-17" type="mesh" mesh="component2.stl" class="collision" />
+      <geom name="assembly_7_collision_3" pos="0.0281825 0.0707432 -0.000322443" quat="1.0 0.0 0.0 0.0" type="mesh" mesh="component707.stl" class="collision" />
+      <geom name="assembly_7_collision_4" pos="0.180853 0.1192 0.0276276" quat="1.3267948966775328e-06 0.0 0.0 0.9999999999991198" type="mesh" mesh="servo_arm_horn_25t_aluminium.stl" class="collision" />
+      <geom name="assembly_7_visual_0" pos="0.180853 0.0191578 0.0276276" quat="1.0 0.0 0.0 0.0" material="servo_arm_horn_25t_aluminium_material" type="mesh" mesh="servo_arm_horn_25t_aluminium.stl" class="visual" />
+      <geom name="assembly_7_visual_1" pos="0.0187847 0.0410598 0.0136672" quat="0.9905504478023395 5.573614101919686e-17 0.13714886203897114 2.5355357762417037e-17" material="component2_material" type="mesh" mesh="component2.stl" class="visual" />
+      <geom name="assembly_7_visual_2" pos="0.0187847 0.10846 0.0136672" quat="0.9905504478023395 5.573614101919686e-17 0.13714886203897114 2.5355357762417037e-17" material="component2_material" type="mesh" mesh="component2.stl" class="visual" />
+      <geom name="assembly_7_visual_3" pos="0.0281825 0.0707432 -0.000322443" quat="1.0 0.0 0.0 0.0" material="component707_material" type="mesh" mesh="component707.stl" class="visual" />
+      <geom name="assembly_7_visual_4" pos="0.180853 0.1192 0.0276276" quat="1.3267948966775328e-06 0.0 0.0 0.9999999999991198" material="servo_arm_horn_25t_aluminium_material" type="mesh" mesh="servo_arm_horn_25t_aluminium.stl" class="visual" />
+      <body name="assembly_9" pos="0.180853 0.1192 0.0286776" quat="1.0 4.326735000000001e-17 5.3028e-17 -6.70605e-17">
+        <joint name="r1" class="rev_joint"  />
+        <inertial pos="0.00950296 0.0152428 -0.0306495" quat="1.0 0.0 0.0 0.0" mass="0.117321" diaginertia="5.92776e-05 3.37113e-05 6.38145e-05" />
+        <geom name="assembly_9_collision_0" pos="0 0 0" quat="1.0 1.45127e-33 -2.20529e-33 2.13675e-33" type="mesh" mesh="ds3225mg_servo_25kg_4_8_6_8v.stl" class="collision" />
+        <geom name="assembly_9_collision_1" pos="-0.0005625 0.0598 -0.0323" quat="0.7071054825112363 -0.7071080798594735 -8.107163111812025e-15 9.634855940734108e-15" type="mesh" mesh="ds3225mg_servo_25kg_4_8_6_8v.stl" class="collision" />
+        <geom name="assembly_9_collision_2" pos="0.0593875 0.042 -0.112549" quat="0.4999981633974483 0.49999999999662686 0.49999999999662686 -0.5000018366025516" type="mesh" mesh="servomount1.stl" class="collision" />
+        <geom name="assembly_9_visual_0" pos="0 0 0" quat="1.0 1.45127e-33 -2.20529e-33 2.13675e-33" material="component2_material" type="mesh" mesh="ds3225mg_servo_25kg_4_8_6_8v.stl" class="visual" />
+        <geom name="assembly_9_visual_1" pos="-0.0005625 0.0598 -0.0323" quat="0.7071054825112363 -0.7071080798594735 -8.107163111812025e-15 9.634855940734108e-15" material="component2_material" type="mesh" mesh="ds3225mg_servo_25kg_4_8_6_8v.stl" class="visual" />
+        <geom name="assembly_9_visual_2" pos="0.0593875 0.042 -0.112549" quat="0.4999981633974483 0.49999999999662686 0.49999999999662686 -0.5000018366025516" material="servo_arm_horn_25t_aluminium_material" type="mesh" mesh="servomount1.stl" class="visual" />
+        <body name="assembly_13" pos="-0.0005625 0.0598 -0.0323" quat="0.4999981633974483 0.49999999999662686 -0.49999999999662686 0.5000018366025516">
+          <joint name="r2" class="rev_joint"  />
+          <inertial pos="-0.0497036 -0.0466015 -0.0305687" quat="1.0 0.0 0.0 0.0" mass="0.316303" diaginertia="0.00107614 0.000345613 0.00123509" />
+          <geom name="assembly_13_collision_0" pos="-0.035 0.0055 -0.03171" quat="9.381839456086127e-07 -0.7071054825106139 9.381873917569988e-07 0.7071080798588512" type="mesh" mesh="part_20.stl" class="collision" />
+          <geom name="assembly_13_collision_1" pos="-0.099256 0.00775 -0.0732163" quat="1.2971259702127103e-06 0.21029187384547848 -2.79014185388395e-07 0.9776386488845441" type="mesh" mesh="part_22.stl" class="collision" />
+          <geom name="assembly_13_collision_2" pos="-0.035 0.0065 -0.0317099" quat="1.0277721014751137e-06 -0.6324174187858825 8.390880897061809e-07 0.7746277870141512" type="mesh" mesh="spur_gear__23_teeth.stl" class="collision" />
+          <geom name="assembly_13_collision_3" pos="-0.099256 0.00775 -0.0732163" quat="1.2971259714933282e-06 0.21029187384547848 -2.790141913419372e-07 0.9776386488845441" type="mesh" mesh="spur_gear__22_teeth.stl" class="collision" />
+          <geom name="assembly_13_collision_4" pos="0 0 0.00105" quat="1.3267948966775328e-06 -0.9999999999991198 4.102306793882796e-30 1.3520395570814712e-30" type="mesh" mesh="servo_arm_horn_25t_aluminium.stl" class="collision" />
+          <geom name="assembly_13_collision_5" pos="-0.0390272 0.0055 -0.0504324" quat="1.114499108619032e-06 -0.5425963908957531 7.199140591179529e-07 0.8399935455615971" type="mesh" mesh="part_17.stl" class="collision" />
+          <geom name="assembly_13_visual_0" pos="-0.035 0.0055 -0.03171" quat="9.381839456086127e-07 -0.7071054825106139 9.381873917569988e-07 0.7071080798588512" material="part_20_material" type="mesh" mesh="part_20.stl" class="visual" />
+          <geom name="assembly_13_visual_1" pos="-0.099256 0.00775 -0.0732163" quat="1.2971259702127103e-06 0.21029187384547848 -2.79014185388395e-07 0.9776386488845441" material="part_22_material" type="mesh" mesh="part_22.stl" class="visual" />
+          <geom name="assembly_13_visual_2" pos="-0.035 0.0065 -0.0317099" quat="1.0277721014751137e-06 -0.6324174187858825 8.390880897061809e-07 0.7746277870141512" material="component2_material" type="mesh" mesh="spur_gear__23_teeth.stl" class="visual" />
+          <geom name="assembly_13_visual_3" pos="-0.099256 0.00775 -0.0732163" quat="1.2971259714933282e-06 0.21029187384547848 -2.790141913419372e-07 0.9776386488845441" material="spur_gear__22_teeth_material" type="mesh" mesh="spur_gear__22_teeth.stl" class="visual" />
+          <geom name="assembly_13_visual_4" pos="0 0 0.00105" quat="1.3267948966775328e-06 -0.9999999999991198 4.102306793882796e-30 1.3520395570814712e-30" material="servo_arm_horn_25t_aluminium_material" type="mesh" mesh="servo_arm_horn_25t_aluminium.stl" class="visual" />
+          <geom name="assembly_13_visual_5" pos="-0.0390272 0.0055 -0.0504324" quat="1.114499108619032e-06 -0.5425963908957531 7.199140591179529e-07 0.8399935455615971" material="servo_arm_horn_25t_aluminium_material" type="mesh" mesh="part_17.stl" class="visual" />
+          <body name="part_1" pos="-0.035 -0.1745 -0.03171" quat="0.4999981633974483 0.49999999999662686 0.49999999999662686 -0.5000018366025516">
+            <joint name="r3_1" class="linear_joint"/>
+            <inertial pos="1.38472e-05 7.99599e-06 -0.0930872" quat="1.0 0.0 0.0 0.0" mass="0.147279" diaginertia="0.000468632 0.000468614 9.32972e-05" />
+            <geom name="part_1_collision" pos="2.77556e-17 -1.38778e-17 -0.18" quat="0.7071054825112363 0.7071080798594735 6.654887893380374e-31 -6.654912338193441e-31" type="mesh" mesh="part_1.stl" class="collision" />
+            <geom name="part_1_visual" pos="2.77556e-17 -1.38778e-17 -0.18" quat="0.7071054825112363 0.7071080798594735 6.654887893380374e-31 -6.654912338193441e-31" material="component2_material" type="mesh" mesh="part_1.stl" class="visual" />
+            <body name="part_4" pos="2.22045e-16 0 -2.10942e-15" quat="1.0 3.0562167167197274e-25 -8.9928e-15 -3.65101e-17">
+              <joint name="r3_2" class="mimic_linear_joint"/>
+              <inertial pos="-3.06039e-07 -9.19232e-06 -0.0853006" quat="1.0 0.0 0.0 0.0" mass="0.111767" diaginertia="0.000294934 0.000294916 5.00057e-05" />
+              <geom name="part_4_collision" pos="0 -6.93889e-18 -0.18" quat="0.7071054825112363 0.7071080798594735 -4.50290469181881e-31 6.204315196145434e-31" type="mesh" mesh="part_4.stl" class="collision" />
+              <geom name="part_4_visual" pos="0 -6.93889e-18 -0.18" quat="0.7071054825112363 0.7071080798594735 -4.50290469181881e-31 6.204315196145434e-31" material="spur_gear__22_teeth_material" type="mesh" mesh="part_4.stl" class="visual" />
+              <body name="assembly_12" pos="-1.66533e-16 4.85723e-17 0.002" quat="1.0 3.045265e-17 2.3184050000000013e-18 3.640135e-17">
+                <joint name="r3_3" class="mimic_linear_joint"/>
+                <inertial pos="-3.31864e-06 0.00632185 -0.0532591" quat="1.0 0.0 0.0 0.0" mass="0.101166" diaginertia="0.00033024 0.000304095 5.27053e-05" />
+                <geom name="assembly_12_collision_0" pos="-2.77556e-17 -6.93889e-18 -0.184" quat="0.7071054825112363 0.7071080798594735 2.6425309697475664e-31 -2.6425406763236373e-31" type="mesh" mesh="part_6.stl" class="collision" />
+                <!-- <geom name="assembly_12_collision_1" pos="-2.35922e-15 0.0419282 0.045" quat="1.0 2.520965e-16 -4.914830000000036e-18 -1.416385e-16" type="mesh" mesh="flat_gripper.stl" class="collision" /> -->
+                <geom name="assembly_12_collision_1_0"
+                      pos="-2.35922e-15 0.0419282 0.045"
+                      quat="1.0 2.520965e-16 -4.914830000000036e-18 -1.416385e-16"
+                      type="mesh" mesh="gripper_0" class="collision"/>
+
+                <geom name="assembly_12_collision_1_1"
+                      pos="-2.35922e-15 0.0419282 0.045"
+                      quat="-1.0 2.520965e-16 -4.914830000000036e-18 -1.416385e-16"
+                      type="mesh" mesh="gripper_1" class="collision"/>
+
+                <geom name="assembly_12_collision_1_2"
+                      pos="-2.35922e-15 0.0419282 0.045"
+                      quat="-1.0 2.520965e-16 -4.914830000000036e-18 -1.416385e-16"
+                      type="mesh" mesh="gripper_2" class="collision"/>
+
+                <geom name="assembly_12_collision_1_3"
+                      pos="-2.35922e-15 0.0419282 0.045"
+                      quat="-1.0 2.520965e-16 -4.914830000000036e-18 -1.416385e-16"
+                      type="mesh" mesh="gripper_3" class="collision"/>
+
+                <geom name="assembly_12_collision_1_4"
+                      pos="-2.35922e-15 0.0419282 0.045"
+                      quat="-1.0 2.520965e-16 -4.914830000000036e-18 -1.416385e-16"
+                      type="mesh" mesh="gripper_4" class="collision"/>
+
+                <geom name="assembly_12_visual_0" pos="-2.77556e-17 -6.93889e-18 -0.184" quat="0.7071054825112363 0.7071080798594735 2.6425309697475664e-31 -2.6425406763236373e-31" material="servo_arm_horn_25t_aluminium_material" type="mesh" mesh="part_6.stl" class="visual" />
+                <!-- <geom name="assembly_12_visual_1" pos="-2.35922e-15 0.0419282 0.045" quat="1.0 2.520965e-16 -4.914830000000036e-18 -1.416385e-16" material="component2_material" type="mesh" mesh="flat_gripper.stl" class="visual" /> -->
+                <geom name="assembly_12_visual_1_0"
+                      pos="-2.35922e-15 0.0419282 0.045"
+                      quat="1.0 2.520965e-16 -4.914830000000036e-18 -1.416385e-16"
+                      type="mesh" mesh="gripper_0" class="collision"/>
+
+                <geom name="assembly_12_visual_1_1"
+                      pos="-2.35922e-15 0.0419282 0.045"
+                      quat="-1.0 2.520965e-16 -4.914830000000036e-18 -1.416385e-16"
+                      type="mesh" mesh="gripper_1" class="collision"/>
+
+                <geom name="assembly_12_visual_1_2"
+                      pos="-2.35922e-15 0.0419282 0.045"
+                      quat="-1.0 2.520965e-16 -4.914830000000036e-18 -1.416385e-16"
+                      type="mesh" mesh="gripper_2" class="collision"/>
+
+                <geom name="assembly_12_visual_1_3"
+                      pos="-2.35922e-15 0.0419282 0.045"
+                      quat="-1.0 2.520965e-16 -4.914830000000036e-18 -1.416385e-16"
+                      type="mesh" mesh="gripper_3" class="collision"/>
+
+                <geom name="assembly_12_visual_1_4"
+                      pos="-2.35922e-15 0.0419282 0.045"
+                      quat="-1.0 2.520965e-16 -4.914830000000036e-18 -1.416385e-16"
+                      type="mesh" mesh="gripper_4" class="collision"/>
+
+                      <site name="r_grip_site" pos="0 0.032 0.057" size="0.005" type="sphere"/>
+
+                <!-- <body name="r3_roll" pos="0 0 0.05" quat="1.0 0.0 0.0 0.0">
+                  <joint name="r3_roll_joint" type="hinge" ref="0.0" class="motor" range="-3.14159 3.14159" axis="1 0 0" />
+                  <inertial mass="0.001" diaginertia="0.001 0.001 0.001" pos="0 0 0"/>
+                  <geom name="r3_roll_visual" pos="0 0 0" quat="1.0 0.0 0.0 0.0" material="default_material" type="cylinder" size="0.001 0.0005" class="visual" />
+                  <body name="r3_pitch" pos="0 0 0" quat="1.0 0.0 0.0 0.0">
+                    <joint name="r3_pitch_joint" type="hinge" ref="0.0" class="motor" range="-3.14159 3.14159" axis="0 1 0" />
+                    <inertial mass="0.001" diaginertia="0.001 0.001 0.001" pos="0 0 0"/>
+                    <geom name="r3_pitch_visual" pos="0 0 0" quat="1.0 0.0 0.0 0.0" material="default_material" type="cylinder" size="0.001 0.0005" class="visual" />
+                    <body name="r3_yaw" pos="0 0 0" quat="1.0 0.0 0.0 0.0">
+                      <joint name="r3_yaw_joint" type="hinge" ref="0.0" class="motor" range="-3.14159 3.14159" axis="0 0 1" />
+                      <inertial mass="0.001" diaginertia="0.001 0.001 0.001" pos="0 0 0"/>
+                      <geom name="r3_yaw_visual" pos="0 0 0" quat="1.0 0.0 0.0 0.0" material="default_material" type="cylinder" size="0.001 0.0005" class="visual" />
+                    </body>
+                  </body>
+                </body> -->
+              </body>
+            </body>
+          </body>
+        </body>
+      </body>
+      <body name="assembly_8" pos="0.180853 0.0191578 0.0286776" quat="1.0 4.9602886198e-31 2.664835e-18 9.6012e-14">
+        <joint name="l1" class="rev_joint"  />
+        <inertial pos="0.0103209 -0.0152428 -0.0306495" quat="1.0 0.0 0.0 0.0" mass="0.117321" diaginertia="5.92776e-05 3.37166e-05 6.38198e-05" />
+        <geom name="assembly_8_collision_0" pos="-0.0393875 -0.042 -0.112549" quat="0.4999981633974483 -0.49999999999662686 0.49999999999662686 0.5000018366025516" type="mesh" mesh="servomount1.stl" class="collision" />
+        <geom name="assembly_8_collision_1" pos="0 0 0" quat="1.0 0.0 -0.0 -3.997245e-48" type="mesh" mesh="ds3225mg_servo_25kg_4_8_6_8v.stl" class="collision" />
+        <geom name="assembly_8_collision_2" pos="0.0005625 -0.0598 -0.0323" quat="0.7071054825112363 0.7071080798594735 -4.71567369044838e-14 1.1983497595840726e-15" type="mesh" mesh="ds3225mg_servo_25kg_4_8_6_8v.stl" class="collision" />
+        <geom name="assembly_8_visual_0" pos="-0.0393875 -0.042 -0.112549" quat="0.4999981633974483 -0.49999999999662686 0.49999999999662686 0.5000018366025516" material="servo_arm_horn_25t_aluminium_material" type="mesh" mesh="servomount1.stl" class="visual" />
+        <geom name="assembly_8_visual_1" pos="0 0 0" quat="1.0 0.0 -0.0 -3.997245e-48" material="component2_material" type="mesh" mesh="ds3225mg_servo_25kg_4_8_6_8v.stl" class="visual" />
+        <geom name="assembly_8_visual_2" pos="0.0005625 -0.0598 -0.0323" quat="0.7071054825112363 0.7071080798594735 -4.71567369044838e-14 1.1983497595840726e-15" material="component2_material" type="mesh" mesh="ds3225mg_servo_25kg_4_8_6_8v.stl" class="visual" />
+        <body name="assembly_10" pos="0.0005625 -0.0598 -0.0323" quat="0.4999981633974483 -0.49999999999662686 0.49999999999662686 0.5000018366025516">
+          <joint name="l2" class="rev_joint"  />
+          <inertial pos="0.0497031 -0.0466015 -0.0305736" quat="1.0 0.0 0.0 0.0" mass="0.316303" diaginertia="0.00107615 0.000345634 0.00123511" />
+          <geom name="assembly_10_collision_0" pos="0 0 0.00105" quat="1.3267948966775328e-06 0.9999999999991198 0.0 0.0" type="mesh" mesh="servo_arm_horn_25t_aluminium.stl" class="collision" />
+          <geom name="assembly_10_collision_1" pos="0.0984855 0.00775 0.0101353" quat="1.2996495927033807e-06 0.9795406885934329 2.670124812946978e-07 -0.201246215835585" type="mesh" mesh="part_22.stl" class="collision" />
+          <geom name="assembly_10_collision_2" pos="0.0365086 0.0055 -0.0200863" quat="1.0511354457770864e-06 0.7922370451350524 -8.096272935411559e-07 0.6102134579914805" type="mesh" mesh="part_17.stl" class="collision" />
+          <geom name="assembly_10_collision_3" pos="0.035 0.0055 0.06829" quat="9.381839456086127e-07 -0.7071054825106139 -9.381873917569988e-07 -0.7071080798588512" type="mesh" mesh="part_23.stl" class="collision" />
+          <geom name="assembly_10_collision_4" pos="0.0984855 0.00775 0.0101353" quat="1.2996495927276912e-06 0.9795406885934329 2.670124814130263e-07 -0.201246215835585" type="mesh" mesh="spur_gear__22_teeth.stl" class="collision" />
+          <geom name="assembly_10_collision_5" pos="0.0349999 0.0335 -0.03171" quat="1.0 -1.5415449999999059e-13 -4.721225000003074e-14 1.9939599999999273e-13" type="mesh" mesh="spur_gear__23_teeth.stl" class="collision" />
+          <geom name="assembly_10_visual_0" pos="0 0 0.00105" quat="1.3267948966775328e-06 0.9999999999991198 0.0 0.0" material="servo_arm_horn_25t_aluminium_material" type="mesh" mesh="servo_arm_horn_25t_aluminium.stl" class="visual" />
+          <geom name="assembly_10_visual_1" pos="0.0984855 0.00775 0.0101353" quat="1.2996495927033807e-06 0.9795406885934329 2.670124812946978e-07 -0.201246215835585" material="part_22_material" type="mesh" mesh="part_22.stl" class="visual" />
+          <geom name="assembly_10_visual_2" pos="0.0365086 0.0055 -0.0200863" quat="1.0511354457770864e-06 0.7922370451350524 -8.096272935411559e-07 0.6102134579914805" material="servo_arm_horn_25t_aluminium_material" type="mesh" mesh="part_17.stl" class="visual" />
+          <geom name="assembly_10_visual_3" pos="0.035 0.0055 0.06829" quat="9.381839456086127e-07 -0.7071054825106139 -9.381873917569988e-07 -0.7071080798588512" material="part_20_material" type="mesh" mesh="part_23.stl" class="visual" />
+          <geom name="assembly_10_visual_4" pos="0.0984855 0.00775 0.0101353" quat="1.2996495927276912e-06 0.9795406885934329 2.670124814130263e-07 -0.201246215835585" material="spur_gear__22_teeth_material" type="mesh" mesh="spur_gear__22_teeth.stl" class="visual" />
+          <geom name="assembly_10_visual_5" pos="0.0349999 0.0335 -0.03171" quat="1.0 -1.5415449999999059e-13 -4.721225000003074e-14 1.9939599999999273e-13" material="component2_material" type="mesh" mesh="spur_gear__23_teeth.stl" class="visual" />
+          <body name="part_1_2" pos="0.035 -0.1745 -0.03171" quat="0.4999981633974483 0.49999999999662686 -0.49999999999662686 0.5000018366025516">
+            <joint name="l3_1" class="linear_joint"/>
+            <inertial pos="1.38472e-05 7.99599e-06 -0.0930872" quat="1.0 0.0 0.0 0.0" mass="0.147279" diaginertia="0.000468632 0.000468614 9.32972e-05" />
+            <geom name="part_1_2_collision" pos="1.38778e-17 -1.38778e-17 -0.18" quat="0.7071054825112363 0.7071080798594735 -8.930223162351869e-31 -3.5694557136391176e-30" type="mesh" mesh="part_1.stl" class="collision" />
+            <geom name="part_1_2_visual" pos="1.38778e-17 -1.38778e-17 -0.18" quat="0.7071054825112363 0.7071080798594735 -8.930223162351869e-31 -3.5694557136391176e-30" material="component2_material" type="mesh" mesh="part_1.stl" class="visual" />
+            <body name="part_4_2" pos="-1.38778e-17 -1.38778e-17 3.10862e-15" quat="1.0 -2.5900650000000126e-28 -6.66135e-16 -1.89011e-27">
+              <joint name="l3_2" class="mimic_linear_joint"/>
+              <inertial pos="-3.06039e-07 -9.19232e-06 -0.0853006" quat="1.0 0.0 0.0 0.0" mass="0.111767" diaginertia="0.000294934 0.000294916 5.00057e-05" />
+              <geom name="part_4_2_collision" pos="0 0 -0.18" quat="0.7071054825112363 0.7071080798594735 1.9547036987678048e-30 -2.317281253867064e-30" type="mesh" mesh="part_4.stl" class="collision" />
+              <geom name="part_4_2_visual" pos="0 0 -0.18" quat="0.7071054825112363 0.7071080798594735 1.9547036987678048e-30 -2.317281253867064e-30" material="spur_gear__22_teeth_material" type="mesh" mesh="part_4.stl" class="visual" />
+              <body name="assembly_11" pos="1.38778e-17 6.93889e-18 0.002" quat="1.0 3.061615000032816e-17 -1.830555e-14 1.792695e-14">
+                <joint name="l3_3" class="mimic_linear_joint"/>
+                <inertial pos="-3.31864e-06 0.00632185 -0.0532591" quat="1.0 0.0 0.0 0.0" mass="0.101166" diaginertia="0.00033024 0.000304095 5.27053e-05" />
+                <!-- <geom name="assembly_11_collision_0" pos="1.7833e-14 0.0419282 0.045" quat="1.0 -2.831070000000027e-14 1.7985599999999578e-14 1.498800000000051e-14" type="mesh" mesh="flat_gripper.stl" class="collision" /> -->
+                <geom name="assembly_11_collision_1_0"
+                      pos="-2.35922e-15 0.0419282 0.045"
+                      quat="1.0 2.520965e-16 -4.914830000000036e-18 -1.416385e-16"
+                      type="mesh" mesh="gripper_0" class="collision"/>
+
+                <geom name="assembly_11_collision_1_1"
+                      pos="-2.35922e-15 0.0419282 0.045"
+                      quat="-1.0 2.520965e-16 -4.914830000000036e-18 -1.416385e-16"
+                      type="mesh" mesh="gripper_1" class="collision"/>
+
+                <geom name="assembly_11_collision_1_2"
+                      pos="-2.35922e-15 0.0419282 0.045"
+                      quat="-1.0 2.520965e-16 -4.914830000000036e-18 -1.416385e-16"
+                      type="mesh" mesh="gripper_2" class="collision"/>
+
+                <geom name="assembly_11_collision_1_3"
+                      pos="-2.35922e-15 0.0419282 0.045"
+                      quat="-1.0 2.520965e-16 -4.914830000000036e-18 -1.416385e-16"
+                      type="mesh" mesh="gripper_3" class="collision"/>
+
+                <geom name="assembly_11_collision_1_4"
+                      pos="-2.35922e-15 0.0419282 0.045"
+                      quat="-1.0 2.520965e-16 -4.914830000000036e-18 -1.416385e-16"
+                      type="mesh" mesh="gripper_4" class="collision"/>
+                <geom name="assembly_11_collision_1" pos="0 -6.93889e-18 -0.184" quat="0.7071054825112363 0.7071080798594735 -1.950530610339276e-30 -1.864579016886517e-30" type="mesh" mesh="part_6.stl" class="collision" />
+                <!-- <geom name="assembly_11_visual_0" pos="1.7833e-14 0.0419282 0.045" quat="1.0 -2.831070000000027e-14 1.7985599999999578e-14 1.498800000000051e-14" material="component2_material" type="mesh" mesh="flat_gripper.stl" class="visual" /> -->
+                <geom name="assembly_11_visual_1_0"
+                      pos="-2.35922e-15 0.0419282 0.045"
+                      quat="1.0 2.520965e-16 -4.914830000000036e-18 -1.416385e-16"
+                      type="mesh" mesh="gripper_0" class="collision"/>
+
+                <geom name="assembly_11_visual_1_1"
+                      pos="-2.35922e-15 0.0419282 0.045"
+                      quat="-1.0 2.520965e-16 -4.914830000000036e-18 -1.416385e-16"
+                      type="mesh" mesh="gripper_1" class="collision"/>
+
+                <geom name="assembly_11_visual_1_2"
+                      pos="-2.35922e-15 0.0419282 0.045"
+                      quat="-1.0 2.520965e-16 -4.914830000000036e-18 -1.416385e-16"
+                      type="mesh" mesh="gripper_2" class="collision"/>
+
+                <geom name="assembly_11_visual_1_3"
+                      pos="-2.35922e-15 0.0419282 0.045"
+                      quat="-1.0 2.520965e-16 -4.914830000000036e-18 -1.416385e-16"
+                      type="mesh" mesh="gripper_3" class="collision"/>
+
+                <geom name="assembly_11_visual_1_4"
+                      pos="-2.35922e-15 0.0419282 0.045"
+                      quat="-1.0 2.520965e-16 -4.914830000000036e-18 -1.416385e-16"
+                      type="mesh" mesh="gripper_4" class="collision"/>
+                <geom name="assembly_11_visual_1" pos="0 -6.93889e-18 -0.184" quat="0.7071054825112363 0.7071080798594735 -1.950530610339276e-30 -1.864579016886517e-30" material="servo_arm_horn_25t_aluminium_material" type="mesh" mesh="part_6.stl" class="visual" />
+                  <site name="l_grip_site" pos="0 0.032 0.057" size="0.005" type="sphere"/>
+              </body>
+            </body>
+          </body>
+        </body>
+      </body>
+      <site name="base_site" pos="0 0 0" quat="1 0 0 0" />
+      <camera name="front_camera" mode="track" fovy="90.0" quat="4.329780281177467e-17 4.329780281177466e-17 0.7071067811865475 0.7071067811865476" pos="0.0 2.0 0.5" />
+      <camera name="side_camera" mode="track" fovy="90.0" quat="-0.5 -0.4999999999999999 0.5 0.5000000000000001" pos="-2.0 0.0 0.5" />
+    </body>
+  </worldbody>
+
+
+<actuator>
+  <!-- Right arm -->
+  <position name="r1_ctrl" joint="r1" kp="10" kv="0.5" ctrlrange="-1.5708 1.5708" />
+  <position name="r2_ctrl" joint="r2" kp="10" kv="0.5" ctrlrange="-1.5708 1.5708" />
+  <position name="r3_1_ctrl" joint="r3_1" kp="2000" kv="500.0" ctrlrange="0.0 0.134"/>
+  <!-- <position name="r3_ctrl" joint="r3_1" kp="1000" kv="5" inheritrange="1" forcerange="-500 500"/> -->
+  <!-- <position name="r3_roll_joint_ctrl" joint="r3_roll_joint" kp="50" kv="0.5"/>
+  <position name="r3_pitch_joint_ctrl" joint="r3_pitch_joint" kp="50" kv="0.5"/>
+  <position name="r3_yaw_joint_ctrl" joint="r3_yaw_joint" kp="50" kv="0.5"/> -->
+
+  <!-- Right linear actuator -->
+  <!-- <intvelocity name="r3_1_ctrl"
+             joint="r3_1"
+             kp="10000"
+             kv="50"
+             forcelimited="true"
+             forcerange="-200 200"
+             actrange="0 0.134"
+             ctrllimited="true"
+             ctrlrange="-0.005 0.005"/> -->
+
+  <!-- Left arm -->
+  <position name="l1_ctrl" joint="l1" kp="10" ctrlrange="-1.5708 1.5708"/>
+  <position name="l2_ctrl" joint="l2" kp="10" ctrlrange="-1.5708 1.5708"/>
+  <position name="l3_1_ctrl" joint="l3_1" kp="2000" kv="500.0" ctrlrange="0.0 0.134"/>
+  <!-- <position name="l3_ctrl" joint="l3_1" kp="200" kv="5" inheritrange="1" forcerange="-500 500"/> -->
+
+  <!-- Left linear actuator -->
+  <!-- <intvelocity name="l3_1_ctrl"
+             joint="l3_1"
+             kp="10000"
+             kv="50"
+             forcelimited="true"
+             forcerange="-200 200"
+             actrange="0 0.134"
+             ctrllimited="true"
+             ctrlrange="-0.005 0.005"/> -->
+
+  <!-- <velocity name="r3_1_ctrl" joint="r3_1" kv="100" gear="1" ctrlrange="-0.15 0.15"/>
+  <velocity name="l3_1_ctrl" joint="l3_1" kv="100" gear="1" ctrlrange="-0.15 0.15"/> -->
+</actuator>
+
+  <equality>
+    <joint joint1="r3_1" joint2="r3_2" polycoef="0.0 1.0" 
+      solref="0.005 1" 
+      solimp="0.99 0.999 1e-05"/>
+
+    <joint joint1="r3_1" joint2="r3_3" polycoef="0.0 1.0" 
+      solref="0.005 1" 
+      solimp="0.99 0.999 1e-05"/>
+
+    <joint joint1="l3_1" joint2="l3_2" polycoef="0.0 1.0" 
+      solref="0.005 1" 
+      solimp="0.99 0.999 1e-05"/>
+
+    <joint joint1="l3_1" joint2="l3_3" polycoef="0.0 1.0" 
+      solref="0.005 1" 
+      solimp="0.99 0.999 1e-05"/>
+  </equality>
+
+  <contact>
+    <exclude body1="part_4" body2="assembly_12" />
+    <exclude body1="part_1" body2="part_4" />
+    <exclude body1="assembly_13" body2="part_1" />
+    <exclude body1="assembly_9" body2="assembly_13" />
+    <exclude body1="assembly_7" body2="assembly_9" />
+    <exclude body1="part_4_2" body2="assembly_11" />
+    <exclude body1="part_1_2" body2="part_4_2" />
+    <exclude body1="assembly_10" body2="part_1_2" />
+    <exclude body1="assembly_8" body2="assembly_10" />
+    <exclude body1="assembly_7" body2="assembly_8" />
+  </contact>
+
+  <sensor>
+    <framepos name="base_site_pos" objtype="site" objname="base_site" />
+    <framequat name="base_site_quat" objtype="site" objname="base_site" />
+    <framelinvel name="base_site_linvel" objtype="site" objname="base_site" />
+    <frameangvel name="base_site_angvel" objtype="site" objname="base_site" />
+    <velocimeter name="base_site_vel" site="base_site" />
+  </sensor>
+</mujoco>
